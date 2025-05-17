@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 import { PostModel } from "../models/post.model.js";
 
 export const AddPost = async (req,res)=>{
+
     const post = req.body
+    console.log(post);
+    
     if(!post.postName){
     return res.status(404).json({success:false,message:"data can not be null"});
     }

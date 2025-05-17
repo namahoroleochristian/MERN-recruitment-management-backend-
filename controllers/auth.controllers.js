@@ -8,6 +8,7 @@ export const AdminRegister = async (req,res)=>{
     const Admin = req.body;
     
     if (! Admin.name || !Admin.email || !Admin.password) {
+        
         return res.status(404).json({success:false,message:"credentials can not be null"});
     }
     try {
@@ -25,7 +26,7 @@ export const AdminRegister = async (req,res)=>{
 }
 export const UserRegister = async (req,res)=> {
     const User = req.body;
-    if (!User.email || !User.name || !User.password  || !User.role) {
+    if (!User.email || !User.name || !User.password   ) {
         
         return res.status(404).json({success:false,message:"credentials can not be null"});
     }
@@ -47,16 +48,20 @@ export const UserLogin = async (req,res)=>{
     try {
         
         const User = req.body;
+        
         if (!User.email || !User.password) {
             return res.status(404).json({success:false,message:"credentials can not be null"});
             
         }
         const findUser = await UserModel.findOne({email:User.email})
-        const UserPassword = findUser.password
-        if (!UserPassword) {
+        // console.log(!findUser);
+        // const UserPassword = findUser.password
+        if (!findUser) {
             return res.status(403).json({success:false,message:" invalid credentials"});
         }
-        const passwordMatch = await bcrypt.compare(User.password,UserPassword);
+        const passwordMatch = await bcrypt.compare(User.password,findUser.password);
+        console.log(passwordMatch);
+        
         if(passwordMatch){
             const token = jwt.sign({
                 name:findUser.name,
@@ -71,8 +76,11 @@ export const UserLogin = async (req,res)=>{
             });
             return res.status(200).json({success:true,message:" true credentials",token:token});
             
+        }else{
+            
+            return res.status(403).json({success:false,message:" invalid credentials"});
         }
-        return res.status(403).json({success:false,message:" invalid credentials"});
+            
         } catch (error) {
             // return res.status(500).json({success:false,message:error.message});
             console.log(error.message);
@@ -84,6 +92,7 @@ export const AdminLogin = async (req,res)=>{
     try {
         
         const User = req.body;
+        
         if (!User.email || !User.password) {
             return res.status(404).json({success:false,message:"credentials can not be null"});
             
@@ -116,4 +125,15 @@ export const AdminLogin = async (req,res)=>{
             
         
     }
+}
+export const getUser = async (req,res)=>{
+    try {
+        const Users = await UserModel.find();
+        res.status(200).json(Users)
+        
+    } catch (error) {
+        
+        res.status(500).json({success:false,message:error.message})
+    }
+
 }

@@ -8,7 +8,7 @@ const ResultSchema = mongoose.Schema({
     },
     candidateId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"candidates",
+        ref:"Users",
         required:true
     },
     status:{
